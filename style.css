@@ -74,3 +74,37 @@ h1 {
   color: white; /* make sure it's visible on black */
   font-size: 24px;
 }
+/* Background container */
+#background {
+  position: fixed;
+  inset: 0;
+  z-index: -1; /* behind content */
+  background: linear-gradient(135deg, #f4c0d0, #a0c4ff); /* soft pink to soft blue */
+  overflow: hidden;
+}
+
+/* Floating circles/particles */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: floatUp linear infinite;
+}
+
+/* Particle float animation */
+@keyframes floatUp {
+  0% {
+    transform: translateY(100vh) scale(var(--s));
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-10vh) scale(var(--s));
+    opacity: 0;
+  }
+}
