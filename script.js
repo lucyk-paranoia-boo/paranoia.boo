@@ -2,32 +2,33 @@ document.addEventListener("click", () => {
   const bgm = document.getElementById("bgm");
   if (bgm.paused) bgm.play();
 }, { once: true });
+
 const bg = document.getElementById('background');
-const particleCount = 80; // adjust for density
+const blobCount = 20; // fewer blobs, larger size
 
-for (let i = 0; i < particleCount; i++) {
-  const p = document.createElement('div');
-  p.classList.add('particle');
+for (let i = 0; i < blobCount; i++) {
+  const b = document.createElement('div');
+  b.classList.add('blob');
 
-  // random size
-  const size = Math.random() * 30 + 10; // 10px - 40px
-  p.style.width = `${size}px`;
-  p.style.height = `${size}px`;
+  // random size (80px - 250px)
+  const size = Math.random() * 170 + 80;
+  b.style.width = `${size}px`;
+  b.style.height = `${size}px`;
 
-  // pink or blue color
-  p.style.background = Math.random() < 0.5 
-    ? 'rgba(255, 192, 203, 0.3)'  // soft pink
-    : 'rgba(160, 196, 255, 0.3)'; // soft blue
+  // dark pink or deep blue
+  b.style.background = Math.random() < 0.5 
+    ? 'rgba(212, 92, 146, 0.3)'   // dark pink
+    : 'rgba(80, 120, 255, 0.25)'; // dark blue
 
   // random horizontal position
-  p.style.left = `${Math.random() * 100}%`;
+  b.style.left = `${Math.random() * 100}%`;
 
   // random speed
-  const dur = Math.random() * 20 + 15; // 15s - 35s
-  p.style.animationDuration = `${dur}s`;
+  const dur = Math.random() * 40 + 30; // 30s - 70s
+  b.style.animationDuration = `${dur}s`;
 
   // random scale
-  p.style.setProperty('--s', (Math.random() * 0.7 + 0.5).toFixed(2));
+  b.style.setProperty('--s', (Math.random() * 1 + 0.8).toFixed(2));
 
-  bg.appendChild(p);
+  bg.appendChild(b);
 }
