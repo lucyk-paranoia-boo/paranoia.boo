@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horror Page</title>
+    
+    <!-- Google Fonts: Nosifer (Elegant Horror Font) -->
+    <link href="https://fonts.googleapis.com/css2?family=Nosifer&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Full-page background */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Nosifer', cursive;
+            background: url('assets/youve been here before, haven't you.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #f5f5f5;
+            text-align: center;
+        }
+
+        /* Overlay for readability */
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Buttons */
+        .button {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            color: #fff;
+            background-color: #8B0000;
+            border: 2px solid #fff;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #ff0000;
+            transform: scale(1.1);
+        }
+
+        /* Text area */
+        .content {
+            max-width: 800px;
+            margin: 20px auto;
+            font-size: 1.5rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <h1>Welcome to the Haunted Realm</h1>
+
+        <div class="content">
+            <p>Enter if you dare… explore the shadows, uncover the mysteries, and face the unknown.</p>
+        </div>
+
+        <div class="buttons">
+            <a href="page1.html" class="button">Enter the Forest</a>
+            <a href="page2.html" class="button">Visit the Mansion</a>
+            <a href="page3.html" class="button">Dark Secrets</a>
+        </div>
+    </div>
+</body>
+</html>
