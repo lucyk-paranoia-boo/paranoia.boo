@@ -74,37 +74,42 @@ h1 {
   color: white; /* make sure it's visible on black */
   font-size: 24px;
 }
-/* Background container */
+/* Dark TV Girl–inspired background */
 #background {
   position: fixed;
   inset: 0;
-  z-index: -1; /* behind content */
-  background: linear-gradient(135deg, #f4c0d0, #a0c4ff); /* soft pink to soft blue */
+  z-index: -1;
+  background: linear-gradient(135deg, #1a0b1e, #0f1c2d); /* deep purple-blue gradient */
   overflow: hidden;
 }
 
-/* Floating circles/particles */
-.particle {
+/* Floating blobs */
+.blob {
   position: absolute;
   border-radius: 50%;
-  opacity: 0.5;
-  animation: floatUp linear infinite;
+  opacity: 0.3;
+  filter: blur(50px); /* makes the blob soft and glow-like */
+  animation: floatBlob linear infinite;
+  mix-blend-mode: screen; /* makes colors mix softly */
 }
 
-/* Particle float animation */
-@keyframes floatUp {
+/* Blob floating animation */
+@keyframes floatBlob {
   0% {
-    transform: translateY(100vh) scale(var(--s));
+    transform: translateY(120vh) translateX(0) scale(var(--s)) rotate(0deg);
     opacity: 0;
   }
   10% {
-    opacity: 0.4;
+    opacity: 0.2;
   }
   50% {
-    opacity: 0.6;
+    opacity: 0.35;
+  }
+  90% {
+    opacity: 0.2;
   }
   100% {
-    transform: translateY(-10vh) scale(var(--s));
+    transform: translateY(-20vh) translateX(50px) scale(var(--s)) rotate(360deg);
     opacity: 0;
   }
 }
