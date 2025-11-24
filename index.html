@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You're on a path in the woods...</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #111; /* dark theme */
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #800000;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #a00000;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>You're on a path in the woods.</h1>
+        <p>And at the end of that path is a cabin. And in the basement of that cabin is a princess. You're here to slay her. If you don't, it will be the end of the world. </p>
+        <button onclick="goToMain()">(explore)Procced to cabin</button>
+    </div>
+
+    <script>
+        function goToMain() {
+            window.location.href = "blahaj.html"; // link to main page
+        }
+    </script>
+</body>
+</html>
