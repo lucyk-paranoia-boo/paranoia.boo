@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Purple Sparkles</title>
+<style>
+  /* -------------------------
+     Configurable variables
+     ------------------------- */
+  :root{
+    --bg-color: #000;                /* background color */
+    --sparkle1: #b281ff;            /* lighter purple */
+    --sparkle2: #6b2cff;            /* mid purple */
+    --sparkle3: #ff6ff2;            /* accent */
+    --sparkle-size-min: 4px;
+    --sparkle-size-max: 22px;
+    --sparkle-count: 120;           /* if you want more/less, change here or in JS */
+    --animation-duration-min: 6s;
+    --animation-duration-max: 18s;
+  }
+
+  /* -------------------------
+     Page reset + layout
+     ------------------------- */
+  html,body{
+    height:100%;
+    margin:0;
+    background: var(--bg-color);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow:hidden;
+  }
+
+  /* container that holds sparkles (positioned full-screen) */
+  .sky {
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none; /* allows clicking the play button */
+  }
+
+  /* subtle vignette to give depth */
+  .vignette {
+    position:fixed;
+    inset:0;
+    background: radial-gradient(1200px 600px at 50% 35%, rgba(100,44,200,0.08), transparent 10%),
+                radial-gradient(900px 500px at 20% 80%, rgba(80,0,100,0.04), transparent 10%);
+    z-index:1;
+    mix-blend-mode:screen;
+    pointer-events:none;
+  }
+
+  /* play/pause control overlay */
+  .controls {
+    position:fixed;
+    z-index:8;
+    left:20px;
+    bottom:20px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    color:#fff;
+    user-select:none;
+  }
+
+  .btn {
+    --size:56px;
+    width:var(--size);
+    height:var(--size);
+    border-radius:12px;
+    display:inline-grid;
+    place-items:center;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    backdrop-filter: blur(6px);
+    cursor:pointer;
+    border: 1px solid rgba(255,255,255,0.04);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .btn:active{ transform: translateY(1px) scale(.99); }
+  .btn svg{ width:22px; height:22px; fill: white; opacity:0.95; }
+
+  .label {
+    font-size:13px;
+    color:#ddd;
+    opacity:0.95;
+    background: rgba(0,0,0,0.35);
+    padding:8px 12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.03);
+  }
+
+  /* -------------------------
+     Sparkle styling + animations
+     ------------------------- */
+  .sparkle {
+    position:absolute;
+    will-change: transform, opacity;
+    mixed-blend-mode: screen;
+    filter: drop-shadow(0 0 6px rgba(140,80,255,0.16));
+    opacity:0;
+    transform-origin:center;
+    animation-name: floatUp, twinkle, wobble;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    pointer-events:none;
+  }
+
+  /* sparkle shape (glowing circle + soft core) */
+  .sparkle::before{
+    content:"";
+    display:block;
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 35% 30%, rgba(255,255,255,0.95) 0% , rgba(255,255,255,0.25) 6%, transparent 12%),
+      radial-gradient(circle at 50% 60%, rgba(255,255,255,0.6) 0%, transparent 25%),
+      radial-gradient(circle, var(--c1) 0%, var(--c2) 40%, transparent 60%);
+    filter: blur(0.6px);
+    transform: translateZ(0);
+  }
+
+  /* subtle outer glow ring */
+  .sparkle::after{
+    content:"";
+    position:absolute;
+    inset:-10%;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(140,70,255,0.12) 0%, transparent 35%);
+    z-index:-1;
+  }
+
+  /* animation pieces:
+     - floatUp: vertical travel (from bottom-ish to top)
+     - twinkle: opacity/pulse
+     - wobble: slight horizontal movement/rotation for organic motion
+  */
+  @keyframes floatUp {
+    0%   { transform: translateY(20vh) scale(var(--s)); opacity:0; }
+    6%   { opacity:0.9; }
+    50%  { opacity:0.85; }
+    95%  { opacity:0.12; }
+    100% { transform: translateY(-18vh) scale(calc(var(--s)*0.85)); opacity:0; }
+  }
+
+  @keyframes twinkle {
+    0% { filter: brightness(0.9) saturate(1); }
+    10% { filter: brightness(1.35) saturate(1.5); }
+    30% { filter: brightness(1.0) saturate(1.1); }
+    60% { filter: brightness(1.5) saturate(1.6); }
+    100% { filter: brightness(0.85) saturate(0.95); }
+  }
+
+  @keyframes wobble {
+    0%   { transform: translateX(0) translateY(0) rotate(0deg); }
+    25%  { transform: translateX(6px) translateY(-2px) rotate(-1.2deg); }
+    50%  { transform: translateX(-4px) translateY(2px) rotate(1.1deg); }
+    75%  { transform: translateX(3px) translateY(-1px) rotate(-0.5deg); }
+    100% { transform: translateX(0) translateY(0) rotate(0deg); }
+  }
+
+  /* Respect user motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .sparkle { animation: none !important; opacity: 1; }
+  }
+
+  /* small responsive tweaks for very small screens */
+  @media (max-width:420px){
+    .btn { --size:48px; }
+    .label { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sparkles container -->
+<div class="sky" id="sky"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- Controls (play/pause) -->
+<div class="controls" id="controls" aria-hidden="false">
+  <div class="btn" id="playBtn" title="Play / Start">
+    <!-- play icon -->
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+  </div>
+
+  <div class="btn" id="pauseBtn" title="Pause / Stop" style="display:none;">
+    <!-- pause icon -->
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+  </div>
+
+  <div class="label" id="status">Sparkles ready — click play to start music</div>
+</div>
+
+<!-- Audio element (replace src with your music file or URL) -->
+<audio id="bgMusic" loop preload="auto">
+  <!-- Example: use a hosted MP3 link, or change to a local file path like "music.mp3" -->
+  <source src="   phgiujtdehy rsoig[hy urt[oidlhsg[oihsyeroig[jkhs[olkhg[olikshdr[olikfhl[gkhsdlkhg[oirshdgo[krhsdogli[hk" type="audio/mpeg">
+  Your browser does not support the <code>audio</code> element.
+</audio>
+
+<script>
+/* -------------------------
+   Sparkle generator (small JS)
+   - Creates elements and assigns randomized CSS variables
+   - Animation durations/positions are randomized for organic look
+   ------------------------- */
+(function(){
+  const sky = document.getElementById('sky');
+  const COUNT = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sparkle-count')) || 100;
+  const sizeMin = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sparkle-size-min')) || 4;
+  const sizeMax = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sparkle-size-max')) || 18;
+  const durMin = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--animation-duration-min')) || 6;
+  const durMax = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--animation-duration-max')) || 18;
+  const colors = [
+    getComputedStyle(document.documentElement).getPropertyValue('--sparkle1').trim() || '#b281ff',
+    getComputedStyle(document.documentElement).getPropertyValue('--sparkle2').trim() || '#6b2cff',
+    getComputedStyle(document.documentElement).getPropertyValue('--sparkle3').trim() || '#ff6ff2'
+  ];
+
+  function rand(min,max){ return Math.random()*(max-min)+min; }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  for(let i=0;i<COUNT;i++){
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    const size = Math.round(rand(sizeMin, sizeMax));
+    const left = Math.round(rand(-5,105)); // allow a bit overflow on sides
+    const top  = Math.round(rand(10,95));  // start positions vary
+    const dur  = rand(durMin, durMax).toFixed(2) + 's';
+    const delay = rand(-durMax, 0).toFixed(2) + 's'; // negative delays to stagger start
+    const scale = (rand(0.6,1.15)).toFixed(2);
+    const c1 = pick(colors);
+    const c2 = pick(colors);
+
+    // Assign CSS variables to control each sparkle's look & animation
+    s.style.left = left + '%';
+    s.style.top  = top  + '%';
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.setProperty('--s', scale);
+    s.style.setProperty('--c1', c1);
+    s.style.setProperty('--c2', c2);
+    s.style.animationDuration = `${dur}, ${rand(1.6,3.6).toFixed(2)}s, ${rand(3.2,7.6).toFixed(2)}s`;
+    s.style.animationDelay = `${delay}, ${rand(0,2).toFixed(2)}s, ${rand(0,1).toFixed(2)}s`;
+
+    sky.appendChild(s);
+  }
+
+  // Make sparkles gently responsive to window resize (recalculate some positions if needed)
+  window.addEventListener('resize', () => {
+    // no heavy reflow needed; keep static for performance
+  }, {passive:true});
+})();
+
+/* -------------------------
+   Music control + UI
+   ------------------------- */
+(function(){
+  const audio = document.getElementById('bgMusic');
+  const playBtn = document.getElementById('playBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const status  = document.getElementById('status');
+
+  function updateUI(playing){
+    playBtn.style.display = playing ? 'none' : '';
+    pauseBtn.style.display = playing ? '' : 'none';
+    status.textContent = playing ? 'Playing — enjoy the sparkles ✨' : 'Paused — click play to resume';
+  }
+
+  // attempt to unmute and play when user clicks play
+  playBtn.addEventListener('click', async () => {
+    try {
+      audio.currentTime = 0;
+      // some browsers require user gesture to unmute
+      audio.muted = false;
+      await audio.play();
+      updateUI(true);
+    } catch (err) {
+      // fallback: show a message and keep audio muted
+      audio.muted = true;
+      try { await audio.play(); updateUI(true); }
+      catch(e){ updateUI(false); console.warn('Audio could not autoplay:', e); alert('Playback blocked by browser. Try interacting (click) again or use the play button.'); }
+    }
+  });
+
+  pauseBtn.addEventListener('click', () => {
+    audio.pause();
+    updateUI(false);
+  });
+
+  // update UI when audio is paused or played through other means
+  audio.addEventListener('play', ()=> updateUI(true));
+  audio.addEventListener('pause', ()=> updateUI(false));
+  audio.addEventListener('ended', ()=> updateUI(false));
+
+  // helpful keyboard shortcut: space toggles play/pause (when page has focus)
+  window.addEventListener('keydown', (e)=>{
+    if(e.code === 'Space'){
+      e.preventDefault();
+      if(audio.paused) playBtn.click(); else pauseBtn.click();
+    }
+  });
+})();
+</script>
+</body>
+</html>
