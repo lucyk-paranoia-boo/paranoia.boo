@@ -68,3 +68,9 @@ h1 {
   background: rgba(255,255,255,0.2);
   transform: scale(1.05);
 }
+.front {
+  position: relative;
+  z-index: 10;  /* higher than sparkles */
+  color: white; /* make sure it's visible on black */
+  font-size: 24px;
+}
